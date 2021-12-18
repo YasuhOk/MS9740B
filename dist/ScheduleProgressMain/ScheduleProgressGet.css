@@ -1,0 +1,105 @@
+@charset "UTF-8";
+/* table, td, th {border: 1 1px;} */
+table, td, th {border: ridge 1px;}
+
+table{
+  /* table-layout: auto; */
+  table-layout: fixed;
+  width: 1000px;
+  /*見切れるように1000pxにしている*/
+} 
+
+table thead th {
+  /* 縦スクロール時を固定 */
+  position: sticky;
+  top: 0;
+  /* tbody内のセルより手前に表示する */
+  z-index: 1;
+}
+
+table th:first-child {
+  /* 横スクロールを固定 */
+  position: sticky;
+  left: 0;
+  background: #059eb9;
+  color: #f8f7f6;
+} 
+
+table thead th:first-child {
+  /* 一番左端のthead thが横スクロール時に隠れない様に */
+  z-index: 2;
+  background: #f9fafa;
+}
+
+table th{
+  border-collapse: collapse;
+  text-align: left;
+  padding: .2rem .5rem;
+  font-weight: normal;
+  width: 40px;
+  height: 5px;
+}
+/* シリアル番号列幅指定 */
+.Sn {
+  width: 100px;
+}
+/* 受注番号列幅指定 */
+.OrderNumber {
+  width: 100px;
+}
+/* 最終ユーザー列幅指定 */
+.EndUser {
+  width: 1000px;
+}
+/* 今日の日付セル色指定 */
+.today {
+  /* background: #3c4901f3; */
+  background: #f57105fd;
+}
+
+table td{
+  border-collapse: collapse;
+  text-align: left;
+  padding: .1rem .1rem;
+  font-weight: normal;
+  height: 12px;
+}
+
+table thead th {
+  background: #064f5c;
+  color: #f8f7f6;
+  /* color:#d0e4f3 */
+}
+
+ /* --- 明細のｎ行にカーソルが乗ったとき ---------- */
+.dataframe tr:hover td {
+  background    : #abc0ab;           
+}
+
+ /* --- セルにカーソルが乗ったとき --------------- */
+.dataframe td:hover {
+  background    : #f79c7b !important;           /* 背景色    */
+  color         : #ffffff !important;           /* 文字色    */
+  font-weight   :bold;
+}
+
+.fixed_btn
+{
+  position  : fixed;
+  bottom    : 10px; 
+  right     : 10px;
+  padding   : 5px 30px;
+  background-color: #fff;
+  border-color: #59b1eb;
+  border: 2px solid #59b1eb;
+  color: #59b1eb;
+  line-height: 30px;
+  font-size: 14px;
+}
+.fixed_btn:hover {
+  background-color: #59b1eb;
+  border-color: #fff;
+  color: #fff;
+  color: #3d3d35;
+  font-size: 14px;
+}

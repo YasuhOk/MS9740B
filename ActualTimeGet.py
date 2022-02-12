@@ -1,17 +1,28 @@
-from ast import IsNot
-from operator import is_not
+import datetime
 import pyautogui as pgui
 import time
-import pyperclip as clip
-import pandas as pd
-import subprocess
-import sys
-from tkinter import messagebox
+# from ast import IsNot
+# from operator import is_not
+# import pyperclip as clip
+# import pandas as pd
+# import subprocess
+# import sys
+# from tkinter import messagebox
+
+
+# ------------------------------------------------------
+# 関数名     get_first_date
+# 用途       月初を取得
+# 引数       dt = 日付
+# ------------------------------------------------------
+def get_first_date(dt):
+    return dt.replace(day=1)
+
+FirstDate = get_first_date(datetime.date.today())
+strFirstDate = FirstDate.strftime("%Y/%m/%d")
 
 # 製造実績集計ツールを開く
 pgui.press("win")
-
-
 
 # 製造実績集計ツールが開くまで待つ
 while pgui.locateOnScreen(r".\img\SeizoTool.png" , confidence=0.9) is None:
@@ -58,7 +69,7 @@ while pgui.locateOnScreen(r".\img\SeizoToo2.png" , confidence=0.9) is None:
 
 # 開始日付
 pgui.press("tab",3,interval=0.3)
-pgui.typewrite("2022/02/01")
+pgui.typewrite(strFirstDate)
 
 # 作業部門
 pgui.press("tab",5,interval=0.3)

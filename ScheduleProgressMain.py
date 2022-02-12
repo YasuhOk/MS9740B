@@ -21,7 +21,7 @@ import pyperclip as clip
 
 from pyscreeze import showRegionOnScreen
 # import R3AutoExeMain_002 as R3002
-# import R3AutoExeMain_003 as R3003
+# import R3AutoExeMain_003 as R3003aaa
 
 # ------------------------------------------------------
 # 関数名     inijson

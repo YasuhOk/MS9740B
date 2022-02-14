@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['ScheduleProgressMain.py'],
-             pathex=['C:\\Users\\yasu\\Desktop\\MS9740B進捗管理アプリケーション'],
+             pathex=['X:\\Python\\git\\MS9740B'],
              binaries=[],
              datas=[],
              hiddenimports=[],

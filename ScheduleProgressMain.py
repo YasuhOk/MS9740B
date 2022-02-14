@@ -732,8 +732,11 @@ if __name__ == "__main__":
             pgui.typewrite("GMMS11")
             # 完了
             pgui.press("tab",4,interval=0.3)
-            time.sleep(1)
+            time.sleep(0.3)
             pgui.press("space")
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
             # 製造実績集計ツールボタンの位置を特定
             img_x, img_y = pgui.locateCenterOnScreen(r".\img\StartButton.png", grayscale=True, confidence=0.9)
             # オフセット分を計算
@@ -745,6 +748,9 @@ if __name__ == "__main__":
             # 製造実績集計ツールが開くまで待つ
             while pgui.locateOnScreen(r".\img\Executing.png" , confidence=0.9) is not None:
                 time.sleep(1)
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
             # 製造実績集計ツールボタンの位置を特定
             img_x, img_y = pgui.locateCenterOnScreen(r".\img\ExcelButton.png", grayscale=True, confidence=0.9)
             # オフセット分を計算
@@ -757,17 +763,19 @@ if __name__ == "__main__":
             while pgui.locateOnScreen(r".\img\PathIn.png" , confidence=0.9) is None:
                 time.sleep(1)
             # 製造実績集計ツールボタンの位置を特定
-            img_x, img_y = pgui.locateCenterOnScreen(r".\img\PathIn.png", grayscale=True, confidence=0.9)
-            # オフセット分を計算
-            img_x = img_x + offset[0]
-            img_y = img_y + offset[1]
-            # 対象位置へ移動
-            pgui.moveTo(img_x,img_y,1)
-            pgui.click(img_x,img_y)
-            pgui.typewrite(SetActualTimepath)
-            time.sleep(1)
+            # img_x, img_y = pgui.locateCenterOnScreen(r".\img\PathIn.png", grayscale=True, confidence=0.9)
+            # # オフセット分を計算
+            # img_x = img_x + offset[0]
+            # img_y = img_y + offset[1]
+            # # 対象位置へ移動
+            # pgui.moveTo(img_x,img_y,1)
+            # pgui.click(img_x,img_y)
+            pgui.press("tab",5,interval=0.3)
             pgui.press("enter")
-            time.sleep(1)
+            pgui.typewrite(SetActualTimepath)
+            time.sleep(0.3)
+            pgui.press("enter")
+            time.sleep(0.3)
             pgui.hotkey("alt","s")
             print ("処理が完了しました。保存先は下記を参照。" )
             print (SetActualTimepath)

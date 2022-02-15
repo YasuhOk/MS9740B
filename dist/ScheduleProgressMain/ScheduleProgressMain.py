@@ -17,6 +17,7 @@ import json
 import subprocess
 import pyautogui as pgui
 import pyperclip as clip
+import datetime
 
 from pyscreeze import showRegionOnScreen
 # import R3AutoExeMain_002 as R3002
@@ -686,7 +687,7 @@ if __name__ == "__main__":
             pgui.hotkey("alt","tab")
             print("-----------------------------------------------------------------------------------------")
         elif event == "実行":
-            FirstDate = get_first_date(datetime.date.today())
+            FirstDate = get_first_date(datetime.datetime.today())
             strFirstDate = FirstDate.strftime("%Y/%m/%d")
             print("-----------------------------------------------------------------------------------------")
             print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
@@ -770,9 +771,11 @@ if __name__ == "__main__":
             # # 対象位置へ移動
             # pgui.moveTo(img_x,img_y,1)
             # pgui.click(img_x,img_y)
-            pgui.press("tab",5,interval=0.3)
+            pgui.press("tab",6,interval=0.3)
             pgui.press("enter")
-            pgui.typewrite(SetActualTimepath)
+            clip.copy(SetActualTimepath)
+            pgui.hotkey("ctrl","v")
+            # pgui.typewrite(SetActualTimepath)
             time.sleep(0.3)
             pgui.press("enter")
             time.sleep(0.3)

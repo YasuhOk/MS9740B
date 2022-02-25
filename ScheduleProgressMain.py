@@ -17,7 +17,7 @@ import json
 import subprocess
 import pyautogui as pgui
 import pyperclip as clip
-import datetime
+import datetime as Datetime
 import ctypes
 from tkinter import messagebox
 
@@ -689,7 +689,7 @@ if __name__ == "__main__":
             pgui.hotkey("alt","tab")
             print("-----------------------------------------------------------------------------------------")
         elif event == "実行_Auto":
-            FirstDate = get_first_date(datetime.datetime.today())
+            FirstDate = get_first_date(Datetime.datetime.today())
             strFirstDate = FirstDate.strftime("%Y/%m/%d")
             print("-----------------------------------------------------------------------------------------")
             print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
@@ -796,7 +796,7 @@ if __name__ == "__main__":
             print (SetActualTimepath)
             print("-----------------------------------------------------------------------------------------")
         elif event == "実行_Manu":            
-            FirstDate = get_first_date(datetime.datetime.today())
+            FirstDate = get_first_date(Datetime.datetime.today())
             strFirstDate = FirstDate.strftime("%Y/%m/%d")
             print("-----------------------------------------------------------------------------------------")
             print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)

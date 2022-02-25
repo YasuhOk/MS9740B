@@ -17,12 +17,21 @@ import json
 import subprocess
 import pyautogui as pgui
 import pyperclip as clip
-
+import datetime
+import ctypes
+from tkinter import messagebox
 
 from pyscreeze import showRegionOnScreen
 # import R3AutoExeMain_002 as R3002
 # import R3AutoExeMain_003 as R3003
 
+# ------------------------------------------------------
+# 関数名     get_first_date
+# 用途       月初を取得
+# 引数       dt = 日付
+# ------------------------------------------------------
+def get_first_date(dt):
+    return dt.replace(day=1)
 # ------------------------------------------------------
 # 関数名     inijson
 # 用途       iniファイルをjsonに変換
@@ -161,6 +170,7 @@ if __name__ == "__main__":
     ProvisionalNumber = config.get("DefaultSet","ProvisionalNumber")
     KougakubuPath = config.get("Path","kougakubupath")
     KanryouPath = config.get("Path","kanryoupath")
+    ActualTimepath = config.get("Path","actualtimepath")
 
     SetButtonColor="#3d3d35"
     # ウィンドウに配置するコンポーネント--------------------------------------------------------------------------------------------------------------------
@@ -168,7 +178,8 @@ if __name__ == "__main__":
             [sg.Radio(text="【仕掛品取得】既出荷品は取得しない", group_id="A", default=True,text_color="#d0e4f3",font=font)]]
     col1 = [[sg.Text("取得したい開始仮番号を入力してください",text_color="#d0e4f3",font=font)],
             [sg.InputText(font=font,default_text=ProvisionalNumber,size=(7,10),background_color="#d0e4f3")]]
-    layout = [[sg.FileBrowse("計画進捗表",font=font) ,sg.InputText(font=font,default_text=SGExcelPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
+    layout =[[sg.Text("----------------------------------------------------------------------------------------",text_color="#d0e4f3",font=font)],
+            [sg.FileBrowse("計画進捗表",font=font) ,sg.InputText(font=font,default_text=SGExcelPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
             [sg.FileBrowse("製造進捗表",font=font) ,sg.InputText(font=font,default_text=MSExcelPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
             [sg.FolderBrowse("HTML出力 ",font=font) ,sg.InputText(font=font,default_text=HtmlOutPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
             [sg.Frame("取得モード",frame1),sg.Frame("仮番号指定",col1)],
@@ -176,7 +187,13 @@ if __name__ == "__main__":
             [sg.Text("----------------------------------------------------------------------------------------",text_color="#d0e4f3",font=font)],
             [sg.FileBrowse("光学部管理",font=font) ,sg.InputText(font=font,default_text=KougakubuPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
             [sg.FileBrowse("完了管理表",font=font) ,sg.InputText(font=font,default_text=KanryouPath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
-            [sg.Button("光学部開く",button_color=SetButtonColor), sg.Button("完了表開く",button_color=SetButtonColor), sg.Button("R/3(002)実行",button_color=SetButtonColor), sg.Button("R/3(003)実行",button_color=SetButtonColor), sg.Button("閉じる",button_color="#b83811")]]
+            [sg.Button("光学部開く",button_color=SetButtonColor), sg.Button("完了表開く",button_color=SetButtonColor), sg.Button("R/3(002)実行",button_color=SetButtonColor), sg.Button("R/3(003)実行",button_color=SetButtonColor)],
+            [sg.Text("----------------------------------------------------------------------------------------",text_color="#d0e4f3",font=font)],
+            [sg.FileBrowse("製造実工数",font=font) ,sg.InputText(font=font,default_text=ActualTimepath,background_color="#02497c",text_color="#ffffff",size=(55,1))],
+            [sg.Button("実行_Auto",button_color=SetButtonColor),sg.Button("実行_Manu",button_color=SetButtonColor),sg.Button("閉じる",button_color="#b83811")],
+            [sg.Text("----------------------------------------------------------------------------------------",text_color="#d0e4f3",font=font)]]
+
+
     # ----------------------------------------------------------------------------------------------------------------------------------------------------
     # ウィンドウの生成
     window = sg.Window("MS9740B_進捗確認Tool", layout)
@@ -194,6 +211,7 @@ if __name__ == "__main__":
             SetSerialInput = values[5]
             SetKougakubuPath= values[6]
             SetKanryouPath= values[7]
+            SetActualTimepath = values[8]
 
         # 閉じるボタン押下処理
         if event == sg.WIN_CLOSED or event == "閉じる":
@@ -205,6 +223,7 @@ if __name__ == "__main__":
                 config.set("DefaultSet","ProvisionalNumber",SetSerialInput)
                 config.set("Path","kougakubupath",SetKougakubuPath)
                 config.set("Path","kanryoupath",SetKanryouPath)
+                config.set("Path","actualtimepath",SetActualTimepath)
                 
                 with open(ConfigIniPath, "w",encoding="utf-8") as file:
                     config.write(file)
@@ -562,6 +581,7 @@ if __name__ == "__main__":
             shutil.copy(jsonPath,os.path.join(HtmlOutPath ,"Config.json"))
         elif event == "光学部開く":
             pro = subprocess.Popen(SetKougakubuPath,shell=True)
+            print("-----------------------------------------------------------------------------------------")
             print("MS9740A 光学部進捗管理版(原本).xlsmを開いています")
             print("-----------------------------------------------------------------------------------------")
         elif event == "完了表開く":
@@ -668,8 +688,227 @@ if __name__ == "__main__":
             time.sleep(1)
             pgui.hotkey("alt","tab")
             print("-----------------------------------------------------------------------------------------")
-    # os.path.join(os.path.dirname(os.path.abspath(__file__)) ,"ScheduleProgressGet.css")
-    # os.path.join(os.path.dirname(os.path.abspath(__file__)) ,"ScheduleProgressHTML.js")
+        elif event == "実行_Auto":
+            FirstDate = get_first_date(datetime.datetime.today())
+            strFirstDate = FirstDate.strftime("%Y/%m/%d")
+            print("-----------------------------------------------------------------------------------------")
+            print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
+            print("-----------------------------------------------------------------------------------------")
+            # 製造実績集計ツールを開く
+            pgui.press("win")
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\SeizoTool.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\SeizoTool.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\OutButton.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\OutButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\SeizoToo2.png" , confidence=0.9) is None:
+                time.sleep(1)
+            
+            # 仕掛工数情報出力の親ハンドルを取得
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "仕掛工数情報出力")
+            # 仕掛工数情報出力をアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)
+            
+            # 開始日付
+            pgui.press("tab",3,interval=0.3)
+            pgui.typewrite(strFirstDate)
+            # 作業部門
+            pgui.press("tab",5,interval=0.3)
+            pgui.typewrite("GMMS11")
+            # 完了
+            pgui.press("tab",4,interval=0.3)
+            time.sleep(0.3)
+            pgui.press("space")
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\StartButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\Executing.png" , confidence=0.9) is not None:
+                time.sleep(1)
+            
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "仕掛工数情報出力")
+            # 仕掛工数情報出力をアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)            
+            
+            
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\ExcelButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\PathIn.png" , confidence=0.9) is None:
+                time.sleep(1)
+            
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "出力先のファイル名を選択してください")
+            # 出力先のファイル名を選択してくださいをアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)
+            
+            
+            pgui.press("tab",6,interval=0.3)
+            pgui.press("enter")
+            clip.copy(SetActualTimepath)
+            pgui.hotkey("ctrl","v")
+            # pgui.typewrite(SetActualTimepath)
+            time.sleep(0.3)
+            pgui.press("enter")
+            time.sleep(0.3)
+            pgui.hotkey("alt","s")
+            print ("処理が完了しました。保存先は下記を参照。" )
+            print (SetActualTimepath)
+            print("-----------------------------------------------------------------------------------------")
+        elif event == "実行_Manu":            
+            FirstDate = get_first_date(datetime.datetime.today())
+            strFirstDate = FirstDate.strftime("%Y/%m/%d")
+            print("-----------------------------------------------------------------------------------------")
+            print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
+            print("-----------------------------------------------------------------------------------------")
+            # 製造実績集計ツールを開く
+            pgui.press("win")
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\SeizoTool.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\SeizoTool.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\OutButton.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\OutButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\SeizoToo2.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # 開始日付
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
+            
+            # 0000000000031204
+            # 仕掛工数情報出力の親ハンドルを取得
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "仕掛工数情報出力")
+            # 仕掛工数情報出力をアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)
+            
+            pgui.press("tab",3,interval=0.3)
+            pgui.typewrite(strFirstDate)
+            # 作業部門
+            pgui.press("tab",5,interval=0.3)
+            pgui.typewrite("GMMS11")
+            # 完了
+            pgui.press("tab",4,interval=0.3)
+            time.sleep(0.3)
+            pgui.press("space")
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\StartButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\Executing.png" , confidence=0.9) is not None:
+                time.sleep(1)
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
+            
+            # 0000000000031204
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "仕掛工数情報出力")
+            # 仕掛工数情報出力をアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)
+            
+            # 現在位置を取得
+            loc = pgui.position()
+            offset=(0, 0)
+            # 製造実績集計ツールボタンの位置を特定
+            img_x, img_y = pgui.locateCenterOnScreen(r".\img\ExcelButton.png", grayscale=True, confidence=0.9)
+            # オフセット分を計算
+            img_x = img_x + offset[0]
+            img_y = img_y + offset[1]
+            # 対象位置へ移動
+            pgui.moveTo(img_x,img_y,1)
+            pgui.click(img_x,img_y)
+            # 製造実績集計ツールが開くまで待つ
+            while pgui.locateOnScreen(r".\img\PathIn.png" , confidence=0.9) is None:
+                time.sleep(1)
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
+            
+            # 00000000001101E4
+            parent_handle = ctypes.windll.user32.FindWindowW(0, "出力先のファイル名を選択してください")
+            # 出力先のファイル名を選択してくださいをアクティブにする
+            ctypes.windll.user32.SetForegroundWindow(parent_handle)
+            
+            pgui.press("tab",6,interval=0.3)
+            pgui.press("enter")
+            clip.copy(SetActualTimepath)
+            pgui.hotkey("ctrl","v")
+            # pgui.typewrite(SetActualTimepath)
+            time.sleep(0.3)
+            pgui.press("enter")
+            time.sleep(0.3)
+            pgui.hotkey("alt","s")
+            print ("処理が完了しました。保存先は下記を参照。" )
+            print (SetActualTimepath)
+            print("-----------------------------------------------------------------------------------------")
     window.close()
 
     # SGvalueDat呼び出し方法

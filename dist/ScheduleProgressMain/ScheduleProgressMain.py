@@ -17,8 +17,9 @@ import json
 import subprocess
 import pyautogui as pgui
 import pyperclip as clip
-import datetime
+import datetime as Datetime
 import ctypes
+from tkinter import messagebox
 
 from pyscreeze import showRegionOnScreen
 # import R3AutoExeMain_002 as R3002
@@ -688,7 +689,7 @@ if __name__ == "__main__":
             pgui.hotkey("alt","tab")
             print("-----------------------------------------------------------------------------------------")
         elif event == "実行_Auto":
-            FirstDate = get_first_date(datetime.datetime.today())
+            FirstDate = get_first_date(Datetime.datetime.today())
             strFirstDate = FirstDate.strftime("%Y/%m/%d")
             print("-----------------------------------------------------------------------------------------")
             print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
@@ -795,7 +796,7 @@ if __name__ == "__main__":
             print (SetActualTimepath)
             print("-----------------------------------------------------------------------------------------")
         elif event == "実行_Manu":            
-            FirstDate = get_first_date(datetime.datetime.today())
+            FirstDate = get_first_date(Datetime.datetime.today())
             strFirstDate = FirstDate.strftime("%Y/%m/%d")
             print("-----------------------------------------------------------------------------------------")
             print ("製造集計Toolから実績工数ファイルを出力します。開始日付：" + strFirstDate)
@@ -834,8 +835,8 @@ if __name__ == "__main__":
             while pgui.locateOnScreen(r".\img\SeizoToo2.png" , confidence=0.9) is None:
                 time.sleep(1)
             # 開始日付
-            input("Press enter to start operation...")
-            time.sleep(1) 
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
             
             # 0000000000031204
             # 仕掛工数情報出力の親ハンドルを取得
@@ -866,8 +867,8 @@ if __name__ == "__main__":
             # 製造実績集計ツールが開くまで待つ
             while pgui.locateOnScreen(r".\img\Executing.png" , confidence=0.9) is not None:
                 time.sleep(1)
-            input("Press enter to start operation...")
-            time.sleep(1)
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
             
             # 0000000000031204
             parent_handle = ctypes.windll.user32.FindWindowW(0, "仕掛工数情報出力")
@@ -888,8 +889,8 @@ if __name__ == "__main__":
             # 製造実績集計ツールが開くまで待つ
             while pgui.locateOnScreen(r".\img\PathIn.png" , confidence=0.9) is None:
                 time.sleep(1)
-            input("Press enter to start operation...")
-            time.sleep(1)
+            # メッセージボックス（情報） 
+            messagebox.showinfo("中断", "OKボタンを押下後、処理を続行します。")
             
             # 00000000001101E4
             parent_handle = ctypes.windll.user32.FindWindowW(0, "出力先のファイル名を選択してください")
